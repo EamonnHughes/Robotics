@@ -28,11 +28,10 @@ void loop() {
     delay(3000);
 
     while(prizm.readSonicSensorCM(2) >= 15) {
-
       while(prizm.readLineSensor(3) == DARK) {
         if(wentRight){
-          prizm.setMotorPowers(10, 5);
           while (prizm.readLineSensor(3) == DARK) {
+            prizm.setMotorPowers(20, 15);
             if((prizm.readSonicSensorCM(2) < 15)) {
               brake();
               spin(90, 360, true);
@@ -42,10 +41,11 @@ void loop() {
             } 
             delay(1);
           }
+          prizm.setMotorPowers(15, 15);
           wentRight = false;
         } else {
-          prizm.setMotorPowers(5, 10);
           while (prizm.readLineSensor(3) == DARK) {
+            prizm.setMotorPowers(15, 20);
             if((prizm.readSonicSensorCM(2) < 15)) {
               brake();
               spin(90, 360, true);
@@ -55,6 +55,7 @@ void loop() {
             } 
             delay(1);
           }
+          prizm.setMotorPowers(15, 15);
           wentRight = true;
         }
         if((prizm.readSonicSensorCM(2) < 15)) {
@@ -66,7 +67,7 @@ void loop() {
         }
       } 
       while(prizm.readLineSensor(3) == LIGHT) {
-        prizm.setMotorPowers(10, 10);
+        prizm.setMotorPowers(15, 15);
         if((prizm.readSonicSensorCM(2) < 15)) {
           brake();
           spin(90, 360, true);
