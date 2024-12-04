@@ -9,7 +9,6 @@ double ONE_CIRCLE = 360.0;
 double SIGNAL_TIME = 600.0;
 int LIGHT = 0;
 int DARK = 1;
-int sweep = 500;
 
 void setup() {
 
@@ -20,7 +19,7 @@ void setup() {
 }
 
 void loop() {
-  bool wentLeft = true;
+  bool wentRight = false;
 
   prizm.setServoPosition(2, getServoAngle(LEVEL_SERVO));
 
@@ -28,30 +27,12 @@ void loop() {
 
     delay(3000);
 
-    while(prizm.readLineSensor(3) == DARK) {
-      prizm.setMotorPowers(20, 20);
-    }
-    brake();
-
     while(prizm.readSonicSensorCM(2) >= 15) {
 
       while(prizm.readLineSensor(3) == DARK) {
-        if(wentLeft){
-          prizm.setMotorPowers(20, -19);
-          int time = 0;
-          while (prizm.readLineSensor(3) == DARK && time < sweep) {
-            if((prizm.readSonicSensorCM(2) < 15)) {
-              brake();
-              spin(90, 360, true);
-              prizm.setServoPosition(2, getServoAngle(LEVEL_SERVO + 90));
-              delay(1000);
-              prizm.PrizmEnd();
-            } 
-            delay(1);
-            time += 1;
-          }
+        if(wentRight){
+          prizm.setMotorPowers(10, 5);
           while (prizm.readLineSensor(3) == DARK) {
-            prizm.setMotorPowers(-19, 20);
             if((prizm.readSonicSensorCM(2) < 15)) {
               brake();
               spin(90, 360, true);
@@ -61,23 +42,10 @@ void loop() {
             } 
             delay(1);
           }
-          wentLeft = !wentLeft;
+          wentRight = false;
         } else {
-          prizm.setMotorPowers(-19, 20);
-          int time = 0;
-          while (prizm.readLineSensor(3) == DARK && time < sweep) {
-            if((prizm.readSonicSensorCM(2) < 15)) {
-              brake();
-              spin(90, 360, true);
-              prizm.setServoPosition(2, getServoAngle(LEVEL_SERVO + 90));
-              delay(1000);
-              prizm.PrizmEnd();
-            } 
-            delay(1);
-            time += 1;
-          }
+          prizm.setMotorPowers(5, 10);
           while (prizm.readLineSensor(3) == DARK) {
-            prizm.setMotorPowers(20, -19);
             if((prizm.readSonicSensorCM(2) < 15)) {
               brake();
               spin(90, 360, true);
@@ -87,9 +55,8 @@ void loop() {
             } 
             delay(1);
           }
-          wentLeft = !wentLeft;
+          wentRight = true;
         }
-        delay(10);
         if((prizm.readSonicSensorCM(2) < 15)) {
           brake();
           spin(90, 360, true);
@@ -98,9 +65,8 @@ void loop() {
           prizm.PrizmEnd();
         }
       } 
-      delay(10);
       while(prizm.readLineSensor(3) == LIGHT) {
-        prizm.setMotorPowers(20, 20);
+        prizm.setMotorPowers(10, 10);
         if((prizm.readSonicSensorCM(2) < 15)) {
           brake();
           spin(90, 360, true);
