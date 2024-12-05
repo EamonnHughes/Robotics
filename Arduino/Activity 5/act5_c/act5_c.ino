@@ -27,14 +27,14 @@ void loop() {
 
     delay(3000);
 
-    while(prizm.readSonicSensorCM(2) >= 15) {
+    while(prizm.readSonicSensorCM(2) >= 25) {
       while(prizm.readLineSensor(3) == DARK) {
         if(wentRight){
           while (prizm.readLineSensor(3) == DARK) {
             prizm.setMotorSpeeds(200, 35);
-            if((prizm.readSonicSensorCM(2) < 15)) {
+            if((prizm.readSonicSensorCM(2) < 25)) {
               brake();
-              spin(90, 360, true);
+              spinLeft(90, 360, true);
               prizm.setServoPosition(2, getServoAngle(LEVEL_SERVO + 90));
               delay(1000);
               prizm.PrizmEnd();
@@ -47,9 +47,9 @@ void loop() {
         } else {
           while (prizm.readLineSensor(3) == DARK) {
             prizm.setMotorSpeeds(35, 200);
-            if((prizm.readSonicSensorCM(2) < 15)) {
+            if((prizm.readSonicSensorCM(2) < 25)) {
               brake();
-              spin(90, 360, true);
+              spinLeft(90, 360, true);
               prizm.setServoPosition(2, getServoAngle(LEVEL_SERVO + 90));
               delay(1000);
               prizm.PrizmEnd();
@@ -60,9 +60,9 @@ void loop() {
           prizm.setMotorSpeeds(100, 100);
           wentRight = true;
         }
-        if((prizm.readSonicSensorCM(2) < 15)) {
+        if((prizm.readSonicSensorCM(2) < 25)) {
           brake();
-          spin(90, 360, true);
+          spinLeft(90, 360, true);
           prizm.setServoPosition(2, getServoAngle(LEVEL_SERVO + 90));
           delay(1000);
           prizm.PrizmEnd();
@@ -70,9 +70,9 @@ void loop() {
       } 
       while(prizm.readLineSensor(3) == LIGHT) {
         prizm.setMotorSpeeds(100, 100);
-        if((prizm.readSonicSensorCM(2) < 15)) {
+        if((prizm.readSonicSensorCM(2) < 25)) {
           brake();
-          spin(90, 360, true);
+          spinLeft(90, 360, true);
           prizm.setServoPosition(2, getServoAngle(LEVEL_SERVO + 90));
           delay(1000);
           prizm.PrizmEnd();
@@ -81,7 +81,7 @@ void loop() {
 
     }
     brake();
-    spin(90, 360, true);
+    spinLeft(90, 360, true);
     prizm.setServoPosition(2, getServoAngle(LEVEL_SERVO + 90));
     delay(1000);
     prizm.PrizmEnd();
@@ -129,16 +129,23 @@ void brake() {
   delay(50);
 }
 
-void spin(double degrees, int speed, bool brakeAtEnd) {
+void spinRight(double degrees, int speed, bool brakeAtEnd) {
   double radians = (abs(degrees) * 2 * PI) / 360;
   double outerWheelInches = radians * BOT_WIDTH; 
   double outerWheelDegrees = (ONE_CIRCLE * outerWheelInches) / (PI * WHEEL_DIAMETER);
 
-  if (((degrees>0)-(degrees<0)) == -1) {
-    prizm.setMotorSpeeds(speed/2, -speed/2);
-  } else {
-    prizm.setMotorSpeeds(-speed/2, speed/2);
-  }  
+  prizm.setMotorSpeeds(-speed/2, speed/2);
+
+  delay(((outerWheelDegrees / speed) * ONE_SECOND * 1.025));
+  if(brakeAtEnd) brake();
+}
+void spinLeft(double degrees, int speed, bool brakeAtEnd) {
+  double radians = (abs(degrees) * 2 * PI) / 360;
+  double outerWheelInches = radians * BOT_WIDTH; 
+  double outerWheelDegrees = (ONE_CIRCLE * outerWheelInches) / (PI * WHEEL_DIAMETER);
+  
+  prizm.setMotorSpeeds(speed/2, -speed/2);
+  
   delay(((outerWheelDegrees / speed) * ONE_SECOND * 1.025));
   if(brakeAtEnd) brake();
 }
