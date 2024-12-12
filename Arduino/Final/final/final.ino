@@ -19,75 +19,53 @@ void setup() {
 }
 
 void loop() {
-  bool wentRight = false;
-
-  prizm.setServoPosition(2, getServoAngle(LEVEL_SERVO));
-
-  while(prizm.readSonicSensorCM(2) <= 10) {
-
-    delay(3000);
-
-    while(prizm.readSonicSensorCM(2) >= 25) {
-      while(prizm.readLineSensor(3) == DARK) {
-        if(wentRight){
-          while (prizm.readLineSensor(3) == DARK) {
-            prizm.setMotorSpeeds(200, 35);
-            if((prizm.readSonicSensorCM(2) < 25)) {
-              brake();
-              spinLeft(90, 360, true);
-              prizm.setServoPosition(2, getServoAngle(LEVEL_SERVO + 90));
-              delay(1000);
-              prizm.PrizmEnd();
-            } 
-            delay(1);
-          }
-          delay(100);
-          prizm.setMotorSpeeds(100, 100);
-          wentRight = false;
-        } else {
-          while (prizm.readLineSensor(3) == DARK) {
-            prizm.setMotorSpeeds(35, 200);
-            if((prizm.readSonicSensorCM(2) < 25)) {
-              brake();
-              spinLeft(90, 360, true);
-              prizm.setServoPosition(2, getServoAngle(LEVEL_SERVO + 90));
-              delay(1000);
-              prizm.PrizmEnd();
-            } 
-            delay(1);
-          }
-          delay(100);
-          prizm.setMotorSpeeds(100, 100);
-          wentRight = true;
-        }
-        if((prizm.readSonicSensorCM(2) < 25)) {
-          brake();
-          spinLeft(90, 360, true);
-          prizm.setServoPosition(2, getServoAngle(LEVEL_SERVO + 90));
-          delay(1000);
-          prizm.PrizmEnd();
-        }
-      } 
-      while(prizm.readLineSensor(3) == LIGHT) {
-        prizm.setMotorSpeeds(100, 100);
-        if((prizm.readSonicSensorCM(2) < 25)) {
-          brake();
-          spinLeft(90, 360, true);
-          prizm.setServoPosition(2, getServoAngle(LEVEL_SERVO + 90));
-          delay(1000);
-          prizm.PrizmEnd();
+  prizm.setServoPosition(2, 90);
+  // This begins the program
+  while(prizm.readSonicSensorCM(2) < 15) {
+    delay(1000);
+    // 
+    while(prizm.readSonicSensorCM(2) > 35) {
+      prizm.setMotorSpeeds(300, 300);
+      while(prizm.readSonicSensorCM(2) > 35) {
+        delay(10);
+      }
+      if(prizm.readSonicSensorCM(2) < 35) {
+        brake();
+        int newDirection = scanForDirection();
+        if(newDirection == 0) {
+          spinRight(90, 300, true);
+        } else if(newDirection == 1) {
+          spinLeft(90, 300, true);
         }
       }
-
     }
-    brake();
-    spinLeft(90, 360, true);
-    prizm.setServoPosition(2, getServoAngle(LEVEL_SERVO + 90));
-    delay(1000);
-    prizm.PrizmEnd();
-      
   }
 
+  scanForDirection();
+
+  prizm.PrizmEnd();
+}
+
+int scanForDirection() {
+  // This function will run when the robot reaches a wall, and tells the robot which way is clear
+  // 0 signifies a right turn
+  // 1 signifies a left turn
+  // If no way is clear, end
+  prizm.setServoPosition(2, 0);
+  delay(3000);
+  if(prizm.readSonicSensorCM(2) >  35) {
+    prizm.setServoPosition(2, 90);
+    delay(3000);
+    return 0;
+  }
+  prizm.setServoPosition(2, 180);
+  delay(3000);
+  if(prizm.readSonicSensorCM(2) >  35) {
+    prizm.setServoPosition(2, 90);
+    delay(3000);
+    return 1;
+  }
+  prizm.PrizmEnd();
 }
 
 
@@ -99,30 +77,6 @@ int getServoAngle(int angle) {
   newAngle = newAngle % 180;
   return newAngle;
 }
-
-
-// Signal a right turn
-void signalRight() {
-  prizm.setServoPosition(1, 90);
-  for(int j = 0; j < 3; j++ ) {
-    prizm.setRedLED(1);
-    delay(100);
-    prizm.setRedLED(0);
-    delay(100);
-  }
-}
-
-// Signal a left turn
-void signalLeft() {
-  prizm.setServoPosition(1, 0);
-  for(int j = 0; j < 3; j++ ) {
-    prizm.setGreenLED(1);
-    delay(100);
-    prizm.setGreenLED(0);
-    delay(100);
-  }
-}
-
 void brake() {
   prizm.setMotorSpeeds(0, 0);
   prizm.setMotorPowers(125, 125);
@@ -139,6 +93,7 @@ void spinRight(double degrees, int speed, bool brakeAtEnd) {
   delay(((outerWheelDegrees / speed) * ONE_SECOND * 1.025));
   if(brakeAtEnd) brake();
 }
+
 void spinLeft(double degrees, int speed, bool brakeAtEnd) {
   double radians = (abs(degrees) * 2 * PI) / 360;
   double outerWheelInches = radians * BOT_WIDTH; 
