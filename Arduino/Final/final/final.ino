@@ -15,35 +15,32 @@ void setup() {
   prizm.PrizmBegin();
   prizm.setMotorInvert(2, 1);
   prizm.setServoSpeed(2, 50);
+  Serial.begin(9600);
 
 }
+
 
 void loop() {
   prizm.setServoPosition(2, 90);
   // This begins the program
-  while(prizm.readSonicSensorCM(2) < 15) {
+  if(prizm.readSonicSensorCM(4) < 20) {
     delay(1000);
-    // 
-    while(prizm.readSonicSensorCM(2) > 35) {
-      prizm.setMotorSpeeds(300, 300);
-      while(prizm.readSonicSensorCM(2) > 35) {
-        delay(10);
+    while(true) {
+      while(prizm.readSonicSensorCM(4) > 20) {
+        prizm.setMotorSpeeds(300, 300);
+        delay(1);
       }
-      if(prizm.readSonicSensorCM(2) < 35) {
-        brake();
-        int newDirection = scanForDirection();
-        if(newDirection == 0) {
-          spinRight(90, 300, true);
-        } else if(newDirection == 1) {
-          spinLeft(90, 300, true);
-        }
+      if(prizm.readSonicSensorCM(4) < 20) {
+          brake();
+          int newDirection = scanForDirection();
+          if(newDirection == 0) {
+            spinRight(90, 300, true);
+          } else if(newDirection == 1) {
+            spinLeft(90, 300, true);
+          }
       }
     }
   }
-
-  scanForDirection();
-
-  prizm.PrizmEnd();
 }
 
 int scanForDirection() {
@@ -51,16 +48,16 @@ int scanForDirection() {
   // 0 signifies a right turn
   // 1 signifies a left turn
   // If no way is clear, end
-  prizm.setServoPosition(2, 0);
+  prizm.setServoPosition(2, 10);
   delay(3000);
-  if(prizm.readSonicSensorCM(2) >  35) {
+  if(prizm.readSonicSensorCM(4) > 35) {
     prizm.setServoPosition(2, 90);
     delay(3000);
     return 0;
   }
-  prizm.setServoPosition(2, 180);
+  prizm.setServoPosition(2, 170);
   delay(3000);
-  if(prizm.readSonicSensorCM(2) >  35) {
+  if(prizm.readSonicSensorCM(4) > 35) {
     prizm.setServoPosition(2, 90);
     delay(3000);
     return 1;
