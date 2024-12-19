@@ -19,10 +19,12 @@ void setup() {
 
 }
 
-
+// Begin the program
+// If the path is clear move forwards
+// Otherwise, check if left or right is clear
+// Go in the direction that is clear
 void loop() {
   prizm.setServoPosition(2, 90);
-  // This begins the program
   if(prizm.readSonicSensorCM(4) < 20) {
     delay(1000);
     while(true) {
@@ -43,11 +45,11 @@ void loop() {
   }
 }
 
+// This function will run when the robot reaches a wall, and tells the robot which way is clear
+// 0 signifies a right turn
+// 1 signifies a left turn
+// If no way is clear, end
 int scanForDirection() {
-  // This function will run when the robot reaches a wall, and tells the robot which way is clear
-  // 0 signifies a right turn
-  // 1 signifies a left turn
-  // If no way is clear, end
   prizm.setServoPosition(2, 10);
   delay(3000);
   if(prizm.readSonicSensorCM(4) > 35) {
@@ -65,21 +67,14 @@ int scanForDirection() {
   prizm.PrizmEnd();
 }
 
-
-int getServoAngle(int angle) {
-  int newAngle = angle;
-  if(newAngle < 0) {
-    newAngle += 180;
-  }
-  newAngle = newAngle % 180;
-  return newAngle;
-}
+// Stop moving
 void brake() {
   prizm.setMotorSpeeds(0, 0);
   prizm.setMotorPowers(125, 125);
   delay(50);
 }
 
+// Turn in place to the right
 void spinRight(double degrees, int speed, bool brakeAtEnd) {
   double radians = (abs(degrees) * 2 * PI) / 360;
   double outerWheelInches = radians * BOT_WIDTH; 
@@ -91,6 +86,7 @@ void spinRight(double degrees, int speed, bool brakeAtEnd) {
   if(brakeAtEnd) brake();
 }
 
+// Turn in place to the left
 void spinLeft(double degrees, int speed, bool brakeAtEnd) {
   double radians = (abs(degrees) * 2 * PI) / 360;
   double outerWheelInches = radians * BOT_WIDTH; 
